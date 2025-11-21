@@ -346,7 +346,8 @@ function manageProducts(gameId) {
     loadProductsForGame(gameId);
 }
 
-// ========== GESTIÓN DE CATEGORÍAS ==========
+// ========== GESTIÓN DE CATEGORÍAS CORREGIDA ==========
+
 function showCategoryForm() {
     document.getElementById('categoryForm').style.display = 'block';
     document.getElementById('categoryFormTitle').textContent = 'Agregar Nueva Categoría';
@@ -359,16 +360,20 @@ function hideCategoryForm() {
 }
 
 function editCategory(categoryId) {
+    console.log("Editando categoría ID:", categoryId);
+    
     fetch(`api/categories.php?action=get&id=${categoryId}`)
         .then(response => response.json())
-        .then(category => {
-            // Verificar si la respuesta es un error
-            if (category.success === false) {
-                alert('❌ ' + category.message);
+        .then(result => {
+            console.log("Respuesta de categoría:", result);
+            
+            if (result.success === false) {
+                alert('❌ ' + result.message);
                 return;
             }
             
-            // Si llegamos aquí, es que category es el objeto de la categoría directamente
+            // Acceder a los datos a través de result.data
+            const category = result.data;
             document.getElementById('categoryId').value = category.id;
             document.getElementById('categoryName').value = category.name;
             document.getElementById('categoryDescription').value = category.description || '';
@@ -402,7 +407,7 @@ function deleteCategory(categoryId) {
     }
 }
 
-// Formulario de Categorías
+// Formulario de Categorías - CORREGIDO
 document.getElementById('categoryFormElement').addEventListener('submit', function(e) {
     e.preventDefault();
     
@@ -420,6 +425,8 @@ document.getElementById('categoryFormElement').addEventListener('submit', functi
         data.categoryId = categoryId;
     }
     
+    console.log("Enviando datos de categoría:", data);
+    
     fetch('api/categories.php', {
         method: 'POST',
         headers: {
@@ -429,6 +436,8 @@ document.getElementById('categoryFormElement').addEventListener('submit', functi
     })
     .then(response => response.json())
     .then(result => {
+        console.log("Respuesta del servidor:", result);
+        
         if (result.success) {
             alert('✅ ' + result.message);
             location.reload();
@@ -441,5 +450,3 @@ document.getElementById('categoryFormElement').addEventListener('submit', functi
         alert('❌ Error de conexión');
     });
 });
-
-console.log('✅ Panel administrativo cargado correctamente');

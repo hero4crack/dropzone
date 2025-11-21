@@ -358,15 +358,83 @@ $admin = $stmt->fetch(PDO::FETCH_ASSOC);
                 </div>
             </div>
             
-            <!-- Gestión de Productos -->
-            <div id="products" class="tab-content">
-                <h2>Gestión de Productos y Precios</h2>
-                <div id="productsManagement">
-                    <div class="card">
-                        <p>Selecciona un juego para gestionar sus productos.</p>
+           <!-- Gestión de Productos -->
+<div id="products" class="tab-content">
+    <h2>Gestión de Productos y Precios</h2>
+    
+    <!-- Selector de Juegos -->
+    <div class="card">
+        <h3>Seleccionar Juego</h3>
+        <div class="form-group">
+            <label>Elige un juego para gestionar sus productos:</label>
+            <select id="gameSelector" class="form-control" onchange="loadProductsForGame(this.value)">
+                <option value="">-- Selecciona un juego --</option>
+                <?php
+                $stmt = $db->query("SELECT id, name FROM games ORDER BY name");
+                while ($game = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    echo "<option value='{$game['id']}'>{$game['name']}</option>";
+                }
+                ?>
+            </select>
+        </div>
+    </div>
+
+    <!-- Gestión de Productos (se muestra cuando se selecciona un juego) -->
+    <div id="productsManagement" style="display: none;">
+        <!-- Formulario para agregar/editar producto -->
+        <div class="card">
+            <h3 id="productFormTitle">Agregar Nuevo Producto</h3>
+            <form id="productForm">
+                <input type="hidden" id="productId" name="productId">
+                <input type="hidden" id="selectedGameId" name="game_id">
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Nombre del Producto</label>
+                        <input type="text" id="productName" name="name" class="form-control" required 
+                               placeholder="Ej: 1000 V-Bucks, Paquete Básico">
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción</label>
+                        <input type="text" id="productDescription" name="description" class="form-control"
+                               placeholder="Ej: Paquete de monedas básico">
+                    </div>
+                    <div class="form-group">
+                        <label>Cantidad (CP, V-Bucks, Monedas, etc.)</label>
+                        <input type="text" id="productCurrency" name="currency_amount" class="form-control" required
+                               placeholder="Ej: 1000, 5000, 10000">
+                    </div>
+                    <div class="form-group">
+                        <label>Precio (Bs.)</label>
+                        <input type="number" id="productPrice" name="price" class="form-control" step="0.01" required
+                               placeholder="Ej: 5.00, 10.00, 18.00">
                     </div>
                 </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="productAvailable" name="is_available" checked> Producto disponible
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn">
+                    <i class="fas fa-save"></i> Guardar Producto
+                </button>
+                <button type="button" class="btn" onclick="resetProductForm()" style="background: var(--medium-gray);">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </form>
+        </div>
+
+        <!-- Lista de productos existentes -->
+        <div class="card">
+            <h3>Productos del Juego</h3>
+            <div id="productsList">
+                <p>No hay productos para este juego.</p>
             </div>
+        </div>
+    </div>
+</div>
             
             <!-- Gestión de Categorías -->
             <div id="categories" class="tab-content">

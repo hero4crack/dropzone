@@ -127,153 +127,109 @@ document.getElementById('gameFormElement').addEventListener('submit', function(e
     });
 });
 
-// ========== GESTIÓN DE PRODUCTOS ==========
-function loadProductsManagement(gameId) {
+// ========== GESTIÓN DE PRODUCTOS MEJORADA ==========
+
+function loadProductsForGame(gameId) {
+    if (!gameId) {
+        document.getElementById('productsManagement').style.display = 'none';
+        return;
+    }
+    
+    console.log("Cargando productos para juego ID:", gameId);
+    
+    // Mostrar la sección de gestión
+    document.getElementById('productsManagement').style.display = 'block';
+    document.getElementById('selectedGameId').value = gameId;
+    
+    // Resetear formulario
+    resetProductForm();
+    
+    // Cargar productos existentes
     fetch(`api/products.php?action=get_game_products&game_id=${gameId}`)
         .then(response => response.json())
-        .then(data => {
-            if (!data.success) {
-                alert('❌ ' + data.message);
+        .then(result => {
+            if (!result.success) {
+                document.getElementById('productsList').innerHTML = 
+                    '<p style="color: #e53e3e;">Error al cargar productos: ' + result.message + '</p>';
                 return;
             }
             
-            let html = `
-                <div class="card">
-                    <h3>📊 Gestionar Productos: ${data.game.name}</h3>
-                    <button class="btn" onclick="showProductForm(${gameId})">
-                        <i class="fas fa-plus"></i> Agregar Producto
-                    </button>
-                    
-                    <div id="productForm" class="card" style="display: none; margin-top: 1rem;">
-                        <h4 id="productFormTitle">Agregar Nuevo Producto</h4>
-                        <form id="productFormElement">
-                            <input type="hidden" id="productId" name="productId">
-                            <input type="hidden" name="game_id" value="${gameId}">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                                <div class="form-group">
-                                    <label>Nombre del Producto</label>
-                                    <input type="text" id="productName" name="name" class="form-control" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Descripción</label>
-                                    <input type="text" id="productDescription" name="description" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <label>Cantidad (CP, V-Bucks, etc.)</label>
-                                    <input type="text" id="productCurrency" name="currency_amount" class="form-control" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Precio (Bs.)</label>
-                                    <input type="number" id="productPrice" name="price" class="form-control" step="0.01" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>
-                                    <input type="checkbox" id="productAvailable" name="is_available" checked> Disponible
-                                </label>
-                            </div>
-                            <button type="submit" class="btn">Guardar Producto</button>
-                            <button type="button" class="btn" onclick="hideProductForm()" style="background: var(--medium-gray);">Cancelar</button>
-                        </form>
-                    </div>
-                    
-                    <table class="table" style="margin-top: 1rem;">
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
-                                <th>Precio</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="productsList">
-            `;
-            
-            if (data.products.length === 0) {
-                html += `
-                    <tr>
-                        <td colspan="5" style="text-align: center; padding: 2rem;">
-                            <p>No hay productos para este juego</p>
-                            <button class="btn" onclick="showProductForm(${gameId})" style="margin-top: 1rem;">
-                                <i class="fas fa-plus"></i> Agregar Primer Producto
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            } else {
-                data.products.forEach(product => {
-                    const status = product.is_available ? 
-                        '<span style="color: #48bb78;">✅ Disponible</span>' : 
-                        '<span style="color: #e53e3e;">❌ No Disponible</span>';
-                    
-                    html += `
-                        <tr>
-                            <td>
-                                <strong>${product.name}</strong><br>
-                                <small style="color: #888;">${product.description || 'Sin descripción'}</small>
-                            </td>
-                            <td><strong>${product.currency_amount}</strong></td>
-                            <td><strong style="color: var(--gold);">${parseFloat(product.price).toFixed(2)} Bs.</strong></td>
-                            <td>${status}</td>
-                            <td>
-                                <button class="action-btn" onclick="editProduct(${product.id})" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="action-btn" onclick="deleteProduct(${product.id})" title="Eliminar">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            }
-            
-            html += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            
-            document.getElementById('productsManagement').innerHTML = html;
-            
-            // Agregar evento al formulario de productos
-            const productForm = document.getElementById('productFormElement');
-            if (productForm) {
-                productForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    saveProduct();
-                });
-            }
+            updateProductsList(result.products, result.game);
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('❌ Error al cargar los productos');
+            document.getElementById('productsList').innerHTML = 
+                '<p style="color: #e53e3e;">Error de conexión al cargar productos</p>';
         });
 }
 
-function showProductForm(gameId) {
-    document.getElementById('productForm').style.display = 'block';
-    document.getElementById('productFormTitle').textContent = 'Agregar Nuevo Producto';
-    document.getElementById('productFormElement').reset();
-    document.getElementById('productId').value = '';
+function updateProductsList(products, game) {
+    const productsList = document.getElementById('productsList');
+    
+    if (products.length === 0) {
+        productsList.innerHTML = '<p>No hay productos para este juego.</p>';
+        return;
+    }
+    
+    let html = `
+        <p><strong>Juego:</strong> ${game.name}</p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    products.forEach(product => {
+        const status = product.is_available ? 
+            '<span style="color: #48bb78;">✅ Disponible</span>' : 
+            '<span style="color: #e53e3e;">❌ No disponible</span>';
+        
+        html += `
+            <tr>
+                <td>
+                    <strong>${escapeHtml(product.name)}</strong><br>
+                    <small style="color: #888;">${escapeHtml(product.description || 'Sin descripción')}</small>
+                </td>
+                <td><strong>${escapeHtml(product.currency_amount)}</strong></td>
+                <td><strong style="color: var(--gold);">${parseFloat(product.price).toFixed(2)} Bs.</strong></td>
+                <td>${status}</td>
+                <td>
+                    <button class="action-btn" onclick="editExistingProduct(${product.id})" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn" onclick="deleteExistingProduct(${product.id})" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += `
+            </tbody>
+        </table>
+    `;
+    
+    productsList.innerHTML = html;
 }
 
-function hideProductForm() {
-    document.getElementById('productForm').style.display = 'none';
-}
-
-function editProduct(productId) {
+function editExistingProduct(productId) {
     fetch(`api/products.php?action=get&id=${productId}`)
         .then(response => response.json())
-        .then(product => {
-            // Verificar si la respuesta es un error
-            if (product.success === false) {
-                alert('❌ ' + product.message);
+        .then(result => {
+            if (result.success === false) {
+                alert('❌ ' + result.message);
                 return;
             }
             
-            // Si llegamos aquí, es que product es el objeto del producto directamente
+            const product = result.data;
             document.getElementById('productId').value = product.id;
             document.getElementById('productName').value = product.name;
             document.getElementById('productDescription').value = product.description || '';
@@ -282,7 +238,9 @@ function editProduct(productId) {
             document.getElementById('productAvailable').checked = product.is_available == 1;
             
             document.getElementById('productFormTitle').textContent = 'Editar Producto';
-            document.getElementById('productForm').style.display = 'block';
+            
+            // Scroll to form
+            document.getElementById('productForm').scrollIntoView({ behavior: 'smooth' });
         })
         .catch(error => {
             console.error('Error:', error);
@@ -290,16 +248,16 @@ function editProduct(productId) {
         });
 }
 
-function deleteProduct(productId) {
+function deleteExistingProduct(productId) {
     if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
         fetch(`api/products.php?action=delete&id=${productId}`)
             .then(response => response.json())
             .then(result => {
                 if (result.success) {
                     alert('✅ ' + result.message);
-                    // Recargar la gestión de productos
-                    const gameId = document.querySelector('input[name="game_id"]').value;
-                    loadProductsManagement(gameId);
+                    // Recargar la lista de productos
+                    const gameId = document.getElementById('selectedGameId').value;
+                    loadProductsForGame(gameId);
                 } else {
                     alert('❌ ' + result.message);
                 }
@@ -311,19 +269,40 @@ function deleteProduct(productId) {
     }
 }
 
-function saveProduct() {
-    const form = document.getElementById('productFormElement');
-    const formData = new FormData(form);
+function resetProductForm() {
+    document.getElementById('productForm').reset();
+    document.getElementById('productId').value = '';
+    document.getElementById('productFormTitle').textContent = 'Agregar Nuevo Producto';
+}
+
+// Función helper para escapar HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Manejar envío del formulario de productos
+document.getElementById('productForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
     const productId = document.getElementById('productId').value;
+    const gameId = document.getElementById('selectedGameId').value;
+    
+    if (!gameId) {
+        alert('❌ Primero selecciona un juego');
+        return;
+    }
     
     const data = {
         action: productId ? 'update' : 'create',
-        game_id: formData.get('game_id'),
-        name: formData.get('name'),
-        description: formData.get('description'),
-        currency_amount: formData.get('currency_amount'),
-        price: formData.get('price'),
-        is_available: formData.get('is_available') ? 1 : 0
+        game_id: gameId,
+        name: document.getElementById('productName').value,
+        description: document.getElementById('productDescription').value,
+        currency_amount: document.getElementById('productCurrency').value,
+        price: document.getElementById('productPrice').value,
+        is_available: document.getElementById('productAvailable').checked ? 1 : 0
     };
     
     if (productId) {
@@ -341,8 +320,8 @@ function saveProduct() {
     .then(result => {
         if (result.success) {
             alert('✅ ' + result.message);
-            const gameId = document.querySelector('input[name="game_id"]').value;
-            loadProductsManagement(gameId);
+            resetProductForm();
+            loadProductsForGame(gameId); // Recargar la lista
         } else {
             alert('❌ ' + result.message);
         }
@@ -351,6 +330,20 @@ function saveProduct() {
         console.error('Error:', error);
         alert('❌ Error de conexión');
     });
+});
+
+// También actualiza la función manageProducts existente para redirigir a la pestaña correcta
+function manageProducts(gameId) {
+    // Cambiar a pestaña de productos
+    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    document.querySelector('[data-tab="products"]').classList.add('active');
+    document.getElementById('products').classList.add('active');
+    
+    // Seleccionar el juego automáticamente
+    document.getElementById('gameSelector').value = gameId;
+    loadProductsForGame(gameId);
 }
 
 // ========== GESTIÓN DE CATEGORÍAS ==========

@@ -716,6 +716,141 @@ foreach ($allGames as $game) {
             font-size: 0.9rem;
             font-family: 'Exo 2', sans-serif;
         }
+
+
+
+/* NUEVOS ESTILOS PARA TARJETAS DE JUEGOS COMPACTAS */
+.games-grid-compact {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.game-card-compact {
+    background: var(--dark-gray);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid var(--medium-gray);
+    position: relative;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+}
+
+.game-card-compact:hover {
+    transform: translateY(-5px);
+    border-color: var(--gold);
+    box-shadow: 0 8px 20px rgba(200, 160, 50, 0.2);
+    text-decoration: none;
+}
+
+.game-image-container {
+    position: relative;
+    width: 100%;
+    height: 150px;
+    overflow: hidden;
+}
+
+.game-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: transform 0.3s ease;
+    background-color: var(--black); /* Fondo de respaldo */
+}
+
+.game-card-compact:hover .game-image {
+    transform: scale(1.05);
+}
+
+.hot-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: linear-gradient(45deg, #FF5E14, #FF8C42);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 8px rgba(255, 94, 20, 0.4);
+    z-index: 2;
+}
+
+.game-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.8) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.game-card-compact:hover .game-overlay {
+    opacity: 1;
+}
+
+.game-name {
+    color: var(--white);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+}
+
+.game-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.btn-view-prices {
+    background: var(--gold);
+    color: var(--black);
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.game-card-compact:hover .btn-view-prices {
+    background: var(--white);
+    transform: translateY(-2px);
+}
+
+/* Imagen por defecto cuando no carga */
+.game-image::before {
+    content: "🎮";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    color: var(--gold);
+    opacity: 0.7;
+    display: none;
+}
+
+.game-image:empty::before {
+    display: block;
+}
+
+
+
         
         /* Responsive */
         @media (max-width: 768px) {
@@ -867,68 +1002,59 @@ foreach ($allGames as $game) {
             </div>
         </section>
         
-        <!-- Juegos por Categoría -->
-        <section class="products" id="products">
-            <div class="container">
-                <?php 
-                $gamesByCategory = [];
-                foreach ($gamesWithProducts as $item) {
-                    $categoryId = $item['game']['category_id'];
-                    if (!isset($gamesByCategory[$categoryId])) {
-                        $gamesByCategory[$categoryId] = [
-                            'category' => $item['game'],
-                            'games' => []
-                        ];
-                    }
-                    $gamesByCategory[$categoryId]['games'][] = $item;
-                }
-                ?>
-                
-                <?php foreach ($gamesByCategory as $categoryId => $categoryData): ?>
-                    <?php if (count($categoryData['games']) > 0): ?>
-                        <div class="product-category" id="category-<?php echo $categoryId; ?>">
-                            <div class="category-header">
-                                <h2>
-                                    <i class="<?php echo $categoryData['category']['category_icon'] ?: 'fas fa-gamepad'; ?>"></i>
-                                    <?php echo htmlspecialchars($categoryData['category']['category_name']); ?>
-                                </h2>
-                                <a href="#categories" class="view-all">Ver Todas las Categorías</a>
-                            </div>
-                            <div class="product-grid">
-                                <?php foreach ($categoryData['games'] as $item): ?>
-                                    <div class="product-card" id="game-<?php echo $item['game']['id']; ?>">
-                                        <div class="product-img" style="background-image: url('<?php echo $item['game']['image_url'] ?: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'; ?>')">
-                                            <div class="product-name"><?php echo htmlspecialchars($item['game']['name']); ?></div>
-                                        </div>
-                                        <div class="product-info">
-                                            <h3><?php echo htmlspecialchars($item['game']['name']); ?></h3>
-                                            <p><?php echo htmlspecialchars($item['game']['description'] ?: 'Recargas disponibles'); ?></p>
-                                            
-                                            <div class="price-list">
-                                                <?php if (count($item['products']) > 0): ?>
-                                                    <?php foreach ($item['products'] as $product): ?>
-                                                        <div class="price-item">
-                                                            <span class="currency-amount"><?php echo htmlspecialchars($product['currency_amount']); ?></span>
-                                                            <span class="price"><?php echo number_format($product['price'], 2); ?> Bs.</span>
-                                                        </div>
-                                                    <?php endforeach; ?>
-                                                <?php else: ?>
-                                                    <p style="color: var(--gold); text-align: center; font-style: italic;">
-                                                        Próximamente...
-                                                    </p>
-                                                <?php endif; ?>
-                                            </div>
-                                            
-                                            <a href="#" class="btn-small">Ver Todos los Precios</a>
+      <!-- Juegos por Categoría - VERSIÓN CORREGIDA -->
+<section class="products" id="products">
+    <div class="container">
+        <?php 
+        $gamesByCategory = [];
+        foreach ($gamesWithProducts as $item) {
+            $categoryId = $item['game']['category_id'];
+            if (!isset($gamesByCategory[$categoryId])) {
+                $gamesByCategory[$categoryId] = [
+                    'category' => $item['game'],
+                    'games' => []
+                ];
+            }
+            $gamesByCategory[$categoryId]['games'][] = $item;
+        }
+        ?>
+        
+        <?php foreach ($gamesByCategory as $categoryId => $categoryData): ?>
+            <?php if (count($categoryData['games']) > 0): ?>
+                <div class="product-category" id="category-<?php echo $categoryId; ?>">
+                    <div class="category-header">
+                        <h2>
+                            <i class="<?php echo $categoryData['category']['category_icon'] ?: 'fas fa-gamepad'; ?>"></i>
+                            <?php echo htmlspecialchars($categoryData['category']['category_name']); ?>
+                        </h2>
+                        <a href="#categories" class="view-all">Ver Todas las Categorías</a>
+                    </div>
+                    
+                    <!-- GRID DE JUEGOS COMPACTO - SOLO IMAGEN Y NOMBRE -->
+                    <div class="games-grid-compact">
+                        <?php foreach ($categoryData['games'] as $item): ?>
+                            <a href="game-prices.php?game_id=<?php echo $item['game']['id']; ?>" class="game-card-compact" id="game-<?php echo $item['game']['id']; ?>">
+                                <div class="game-image-container">
+                                    <div class="game-image" style="background-image: url('<?php echo !empty($item['game']['image_url']) ? htmlspecialchars($item['game']['image_url']) : 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'; ?>')">
+                                        <?php if ($item['game']['featured']): ?>
+                                            <div class="hot-badge">HOT</div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="game-overlay">
+                                        <div class="game-name"><?php echo htmlspecialchars($item['game']['name']); ?></div>
+                                        <div class="game-actions">
+                                            <span class="btn-view-prices">Ver Precios</span>
                                         </div>
                                     </div>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            </div>
-        </section>
+                                </div>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    </div>
+</section>
         
         <!-- Banner Promocional -->
         <section class="promo-banner">

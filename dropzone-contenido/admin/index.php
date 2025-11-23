@@ -25,6 +25,9 @@ if ($stmt->rowCount() === 0) {
 }
 
 $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Verificar si es super_admin
+$isSuperAdmin = ($admin['role'] === 'super_admin');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -192,6 +195,31 @@ $admin = $stmt->fetch(PDO::FETCH_ASSOC);
         .tab-content.active {
             display: block;
         }
+
+        .role-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .role-super_admin {
+            background: #d4af37;
+            color: #000;
+        }
+        
+        .role-admin {
+            background: #2d3748;
+            color: #fff;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
@@ -212,6 +240,14 @@ $admin = $stmt->fetch(PDO::FETCH_ASSOC);
             <div class="nav-item" data-tab="categories">
                 <i class="fas fa-layer-group"></i>Categorías
             </div>
+            
+            <!-- Mostrar Gestión de Admins solo para super_admins -->
+            <?php if ($isSuperAdmin): ?>
+            <div class="nav-item" data-tab="admins">
+                <i class="fas fa-users-cog"></i>Gestión de Admins
+            </div>
+            <?php endif; ?>
+            
             <div class="nav-item" onclick="window.location.href='../index.php'">
                 <i class="fas fa-eye"></i>Ver Tienda
             </div>
@@ -224,7 +260,12 @@ $admin = $stmt->fetch(PDO::FETCH_ASSOC);
         <div class="main-content">
             <div class="header">
                 <h1>Panel Administrativo</h1>
-                <div>Bienvenido, <?php echo $user['username']; ?> (<?php echo $admin['role']; ?>)</div>
+                <div>
+                    Bienvenido, <?php echo $user['username']; ?> 
+                    <span class="role-badge <?php echo $admin['role'] === 'super_admin' ? 'role-super_admin' : 'role-admin'; ?>">
+                        <?php echo $admin['role']; ?>
+                    </span>
+                </div>
             </div>
             
             <!-- Dashboard -->
@@ -237,7 +278,8 @@ $admin = $stmt->fetch(PDO::FETCH_ASSOC);
                         'Total Juegos' => 'SELECT COUNT(*) FROM games',
                         'Productos Activos' => 'SELECT COUNT(*) FROM products WHERE is_available = 1',
                         'Categorías' => 'SELECT COUNT(*) FROM categories',
-                        'Usuarios Registrados' => 'SELECT COUNT(*) FROM users'
+                        'Usuarios Registrados' => 'SELECT COUNT(*) FROM users',
+                        'Administradores' => 'SELECT COUNT(*) FROM admins'
                     ];
                     
                     echo '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">';
@@ -505,6 +547,123 @@ $admin = $stmt->fetch(PDO::FETCH_ASSOC);
                     </table>
                 </div>
             </div>
+
+            <!-- Gestión de Administradores (Solo para super_admins) -->
+            <?php if ($isSuperAdmin): ?>
+            <div id="admins" class="tab-content">
+                <h2>Gestión de Administradores</h2>
+                
+                <button class="btn" onclick="showAdminForm()">
+                    <i class="fas fa-user-plus"></i> Agregar Administrador
+                </button>
+                
+                <!-- Formulario de Administrador -->
+                <div id="adminForm" class="card" style="display: none;">
+                    <h3 id="adminFormTitle">Agregar Nuevo Administrador</h3>
+                    <form id="adminFormElement">
+                        <input type="hidden" id="adminId" name="adminId">
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label>Usuario</label>
+                                <select id="adminUserId" name="user_id" class="form-control" required>
+                                    <option value="">Seleccionar usuario</option>
+                                    <?php
+                                    $stmt = $db->query("
+                                        SELECT u.id, u.username, u.avatar, u.email 
+                                        FROM users u 
+                                        LEFT JOIN admins a ON u.id = a.user_id 
+                                        WHERE a.user_id IS NULL
+                                        ORDER BY u.username
+                                    ");
+                                    while ($userRow = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                        $avatar = $userRow['avatar'] ? $userRow['avatar'] : 'https://cdn.discordapp.com/embed/avatars/0.png';
+                                        echo "<option value='{$userRow['id']}' data-avatar='{$avatar}'>{$userRow['username']} ({$userRow['email']})</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Rol</label>
+                                <select id="adminRole" name="role" class="form-control" required>
+                                    <option value="admin">Administrador</option>
+                                    <option value="super_admin">Super Administrador</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn">
+                            <i class="fas fa-save"></i> Guardar Administrador
+                        </button>
+                        <button type="button" class="btn" onclick="hideAdminForm()" style="background: var(--medium-gray);">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Lista de Administradores -->
+                <div class="card">
+                    <h3>Administradores del Sistema</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Rol</th>
+                                <th>Fecha de Registro</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminsList">
+                            <?php
+                            $stmt = $db->query("
+                                SELECT a.*, u.username, u.email, u.avatar, u.created_at as user_created
+                                FROM admins a 
+                                JOIN users u ON a.user_id = u.id 
+                                ORDER BY a.role DESC, u.username
+                            ");
+                            while ($adminRow = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                $roleClass = $adminRow['role'] === 'super_admin' ? 'role-super_admin' : 'role-admin';
+                                $avatar = $adminRow['avatar'] ? $adminRow['avatar'] : 'https://cdn.discordapp.com/embed/avatars/0.png';
+                                
+                                echo "
+                                <tr>
+                                    <td>
+                                        <img src='{$avatar}' class='user-avatar' alt='Avatar'>
+                                        <div style='display: inline-block; vertical-align: middle;'>
+                                            <strong>{$adminRow['username']}</strong><br>
+                                            <small style='color: #888;'>{$adminRow['email']}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class='role-badge $roleClass'>{$adminRow['role']}</span>
+                                    </td>
+                                    <td>" . date('d/m/Y', strtotime($adminRow['user_created'])) . "</td>
+                                    <td>
+                                        <button class='action-btn' onclick='editAdmin({$adminRow['id']})' title='Editar'>
+                                            <i class='fas fa-edit'></i>
+                                        </button>";
+                                
+                                // No permitir eliminarse a sí mismo
+                                if ($adminRow['user_id'] != $user['id']) {
+                                    echo "
+                                        <button class='action-btn' onclick='deleteAdmin({$adminRow['id']})' title='Eliminar'>
+                                            <i class='fas fa-trash'></i>
+                                        </button>";
+                                } else {
+                                    echo "
+                                        <span style='color: #888; font-size: 0.8rem;'>Tú</span>";
+                                }
+                                echo "
+                                    </td>
+                                </tr>";
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 

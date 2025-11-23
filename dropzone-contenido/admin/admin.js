@@ -27,13 +27,11 @@ function editGame(gameId) {
     fetch(`api/games.php?action=get&id=${gameId}`)
         .then(response => response.json())
         .then(result => {
-            // Verificar si la respuesta es exitosa
             if (result.success === false) {
                 alert('❌ ' + result.message);
                 return;
             }
             
-            // Acceder a los datos a través de result.data
             const game = result.data;
             document.getElementById('gameId').value = game.id;
             document.getElementById('gameName').value = game.name;
@@ -73,21 +71,20 @@ function deleteGame(gameId) {
 }
 
 function manageProducts(gameId) {
-    // Cambiar a pestaña de productos y cargar gestión específica
     document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     
     document.querySelector('[data-tab="products"]').classList.add('active');
     document.getElementById('products').classList.add('active');
     
-    loadProductsManagement(gameId);
+    document.getElementById('gameSelector').value = gameId;
+    loadProductsForGame(gameId);
 }
 
 // Formulario de Juegos
 document.getElementById('gameFormElement').addEventListener('submit', function(e) {
     e.preventDefault();
     
-    const formData = new FormData(this);
     const gameId = document.getElementById('gameId').value;
     
     const data = {
@@ -127,7 +124,7 @@ document.getElementById('gameFormElement').addEventListener('submit', function(e
     });
 });
 
-// ========== GESTIÓN DE PRODUCTOS MEJORADA ==========
+// ========== GESTIÓN DE PRODUCTOS ==========
 
 function loadProductsForGame(gameId) {
     if (!gameId) {
@@ -135,16 +132,11 @@ function loadProductsForGame(gameId) {
         return;
     }
     
-    console.log("Cargando productos para juego ID:", gameId);
-    
-    // Mostrar la sección de gestión
     document.getElementById('productsManagement').style.display = 'block';
     document.getElementById('selectedGameId').value = gameId;
     
-    // Resetear formulario
     resetProductForm();
     
-    // Cargar productos existentes
     fetch(`api/products.php?action=get_game_products&game_id=${gameId}`)
         .then(response => response.json())
         .then(result => {
@@ -238,8 +230,6 @@ function editExistingProduct(productId) {
             document.getElementById('productAvailable').checked = product.is_available == 1;
             
             document.getElementById('productFormTitle').textContent = 'Editar Producto';
-            
-            // Scroll to form
             document.getElementById('productForm').scrollIntoView({ behavior: 'smooth' });
         })
         .catch(error => {
@@ -255,7 +245,6 @@ function deleteExistingProduct(productId) {
             .then(result => {
                 if (result.success) {
                     alert('✅ ' + result.message);
-                    // Recargar la lista de productos
                     const gameId = document.getElementById('selectedGameId').value;
                     loadProductsForGame(gameId);
                 } else {
@@ -275,18 +264,15 @@ function resetProductForm() {
     document.getElementById('productFormTitle').textContent = 'Agregar Nuevo Producto';
 }
 
-// Función helper para escapar HTML
 function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
-// Manejar envío del formulario de productos
 document.getElementById('productForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
-    const formData = new FormData(this);
     const productId = document.getElementById('productId').value;
     const gameId = document.getElementById('selectedGameId').value;
     
@@ -321,7 +307,7 @@ document.getElementById('productForm').addEventListener('submit', function(e) {
         if (result.success) {
             alert('✅ ' + result.message);
             resetProductForm();
-            loadProductsForGame(gameId); // Recargar la lista
+            loadProductsForGame(gameId);
         } else {
             alert('❌ ' + result.message);
         }
@@ -332,21 +318,7 @@ document.getElementById('productForm').addEventListener('submit', function(e) {
     });
 });
 
-// También actualiza la función manageProducts existente para redirigir a la pestaña correcta
-function manageProducts(gameId) {
-    // Cambiar a pestaña de productos
-    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-    
-    document.querySelector('[data-tab="products"]').classList.add('active');
-    document.getElementById('products').classList.add('active');
-    
-    // Seleccionar el juego automáticamente
-    document.getElementById('gameSelector').value = gameId;
-    loadProductsForGame(gameId);
-}
-
-// ========== GESTIÓN DE CATEGORÍAS CORREGIDA ==========
+// ========== GESTIÓN DE CATEGORÍAS ==========
 
 function showCategoryForm() {
     document.getElementById('categoryForm').style.display = 'block';
@@ -360,19 +332,14 @@ function hideCategoryForm() {
 }
 
 function editCategory(categoryId) {
-    console.log("Editando categoría ID:", categoryId);
-    
     fetch(`api/categories.php?action=get&id=${categoryId}`)
         .then(response => response.json())
         .then(result => {
-            console.log("Respuesta de categoría:", result);
-            
             if (result.success === false) {
                 alert('❌ ' + result.message);
                 return;
             }
             
-            // Acceder a los datos a través de result.data
             const category = result.data;
             document.getElementById('categoryId').value = category.id;
             document.getElementById('categoryName').value = category.name;
@@ -407,11 +374,9 @@ function deleteCategory(categoryId) {
     }
 }
 
-// Formulario de Categorías - CORREGIDO
 document.getElementById('categoryFormElement').addEventListener('submit', function(e) {
     e.preventDefault();
     
-    const formData = new FormData(this);
     const categoryId = document.getElementById('categoryId').value;
     
     const data = {
@@ -425,8 +390,6 @@ document.getElementById('categoryFormElement').addEventListener('submit', functi
         data.categoryId = categoryId;
     }
     
-    console.log("Enviando datos de categoría:", data);
-    
     fetch('api/categories.php', {
         method: 'POST',
         headers: {
@@ -436,8 +399,105 @@ document.getElementById('categoryFormElement').addEventListener('submit', functi
     })
     .then(response => response.json())
     .then(result => {
-        console.log("Respuesta del servidor:", result);
-        
+        if (result.success) {
+            alert('✅ ' + result.message);
+            location.reload();
+        } else {
+            alert('❌ ' + result.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('❌ Error de conexión');
+    });
+});
+
+// ========== GESTIÓN DE ADMINISTRADORES ==========
+
+function showAdminForm() {
+    document.getElementById('adminForm').style.display = 'block';
+    document.getElementById('adminFormTitle').textContent = 'Agregar Nuevo Administrador';
+    document.getElementById('adminFormElement').reset();
+    document.getElementById('adminId').value = '';
+    document.getElementById('adminRole').value = 'admin';
+}
+
+function hideAdminForm() {
+    document.getElementById('adminForm').style.display = 'none';
+}
+
+function editAdmin(adminId) {
+    fetch(`api/admins.php?action=get&id=${adminId}`)
+        .then(response => response.json())
+        .then(result => {
+            if (result.success === false) {
+                alert('❌ ' + result.message);
+                return;
+            }
+            
+            const admin = result.data;
+            document.getElementById('adminId').value = admin.id;
+            document.getElementById('adminUserId').value = admin.user_id;
+            document.getElementById('adminRole').value = admin.role;
+            
+            document.getElementById('adminFormTitle').textContent = 'Editar Administrador';
+            document.getElementById('adminForm').style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ Error al cargar el administrador');
+        });
+}
+
+function deleteAdmin(adminId) {
+    if (confirm('¿Estás seguro de que quieres eliminar este administrador?')) {
+        fetch(`api/admins.php?action=delete&id=${adminId}`)
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert('✅ ' + result.message);
+                    location.reload();
+                } else {
+                    alert('❌ ' + result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('❌ Error al eliminar el administrador');
+            });
+    }
+}
+
+document.getElementById('adminFormElement').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const adminId = document.getElementById('adminId').value;
+    const userId = document.getElementById('adminUserId').value;
+    
+    if (!userId) {
+        alert('❌ Por favor selecciona un usuario');
+        return;
+    }
+    
+    const data = {
+        action: adminId ? 'update' : 'create',
+        user_id: userId,
+        role: document.getElementById('adminRole').value
+    };
+    
+    if (adminId) {
+        data.adminId = adminId;
+    }
+    
+    fetch('api/admins.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(data)
+    })
+    .then(response => response.json())
+    .then(result => {
         if (result.success) {
             alert('✅ ' + result.message);
             location.reload();

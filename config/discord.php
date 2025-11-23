@@ -2,7 +2,7 @@
 class DiscordAuth {
     private $clientId = '1441099329069777098';
     private $clientSecret = 'ijtwfQjDRzGsIKHEGwlFoAjLMkDT1uBU';
-    private $redirectUri = 'http://localhost/dropzone/dropzone-login/auth/callback.php';
+    private $redirectUri = 'http://192.168.192.62/dropzone/dropzone-login/auth/callback.php';
     private $apiEndpoint = 'https://discord.com/api/v10';
     
     public function getAuthUrl() {

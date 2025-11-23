@@ -175,16 +175,19 @@ foreach ($allGames as $game) {
         }
         
         .user-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: var(--gold);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: var(--black);
-        }
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+    border: 2px solid var(--gold);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
         
         .admin-link {
             background: var(--gold);
@@ -919,22 +922,30 @@ foreach ($allGames as $game) {
                         <li><a href="#products">Juegos</a></li>
                         <li><a href="#">Soporte</a></li>
                         <?php if ($user): ?>
-                            <li class="user-info">
-                                <div class="user-avatar">
-                                    <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
-                                </div>
-                                <span><?php echo htmlspecialchars($user['username']); ?></span>
-                                <?php 
-                                // Verificar si es admin
-                                $stmt = $db->prepare("SELECT role FROM admins WHERE user_id = :user_id");
-                                $stmt->bindParam(':user_id', $user['id']);
-                                $stmt->execute();
-                                if ($stmt->rowCount() > 0): ?>
-                                    <a href="admin/index.php" class="admin-link">Panel Admin</a>
-                                <?php endif; ?>
-                                <a href="../dropzone-login/logout.php" style="color: var(--gold); margin-left: 10px;">Cerrar Sesión</a>
-                            </li>
-                        <?php else: ?>
+    <li class="user-info">
+        <?php 
+        // Construir la URL del avatar de Discord
+        $userAvatar = 'https://cdn.discordapp.com/embed/avatars/0.png'; // Por defecto
+        
+        if (!empty($user['avatar'])) {
+            // Formato: https://cdn.discordapp.com/avatars/{user_id}/{avatar_hash}.png
+            $userAvatar = "https://cdn.discordapp.com/avatars/{$user['id']}/{$user['avatar']}.png";
+        }
+        ?>
+        <img src="<?php echo $userAvatar; ?>" class="user-avatar" alt="Avatar" 
+             onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+        <span><?php echo htmlspecialchars($user['username']); ?></span>
+        <?php 
+        // Verificar si es admin
+        $stmt = $db->prepare("SELECT role FROM admins WHERE user_id = :user_id");
+        $stmt->bindParam(':user_id', $user['id']);
+        $stmt->execute();
+        if ($stmt->rowCount() > 0): ?>
+            <a href="admin/index.php" class="admin-link">Panel Admin</a>
+        <?php endif; ?>
+        <a href="../dropzone-login/logout.php" style="color: var(--gold); margin-left: 10px;">Cerrar Sesión</a>
+    </li>
+<?php else: ?>
                             <li><a href="../dropzone-login/login.php">Iniciar Sesión</a></li>
                         <?php endif; ?>
                     </ul>

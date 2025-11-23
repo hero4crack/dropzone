@@ -434,15 +434,15 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
                     <div class="form-group">
                         <label>Nombre del Producto</label>
                         <input type="text" id="productName" name="name" class="form-control" required 
-                               placeholder="Ej: 1000 V-Bucks, Paquete Básico">
+                               placeholder="Ej: CP, Cristales, Diamantes. etc.">
                     </div>
                     <div class="form-group">
                         <label>Descripción</label>
                         <input type="text" id="productDescription" name="description" class="form-control"
-                               placeholder="Ej: Paquete de monedas básico">
+                               placeholder="Ej: Paquete de monedas básico, Pase de Batalla, etc.">
                     </div>
                     <div class="form-group">
-                        <label>Cantidad (CP, V-Bucks, Monedas, etc.)</label>
+                        <label>Cantidad (Cuanto recibira el cliente)</label>
                         <input type="text" id="productCurrency" name="currency_amount" class="form-control" required
                                placeholder="Ej: 1000, 5000, 10000">
                     </div>

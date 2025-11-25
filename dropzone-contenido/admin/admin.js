@@ -17,6 +17,10 @@ function showGameForm() {
     document.getElementById('gameFormTitle').textContent = 'Agregar Nuevo Juego';
     document.getElementById('gameFormElement').reset();
     document.getElementById('gameId').value = '';
+    
+    // Resetear checkboxes a estado por defecto
+    document.getElementById('gameFeatured').checked = false;
+    document.getElementById('gameActive').checked = true;
 }
 
 function hideGameForm() {
@@ -27,7 +31,7 @@ function editGame(gameId) {
     fetch(`api/games.php?action=get&id=${gameId}`)
         .then(response => response.json())
         .then(result => {
-            if (result.success === false) {
+            if (!result.success) {
                 alert('❌ ' + result.message);
                 return;
             }
@@ -39,6 +43,8 @@ function editGame(gameId) {
             document.getElementById('gameCategory').value = game.category_id;
             document.getElementById('gameImage').value = game.image_url || '';
             document.getElementById('gameBackground').value = game.background_image || '';
+            
+            // ESTA ES LA PARTE IMPORTANTE - Asignar correctamente los checkboxes
             document.getElementById('gameFeatured').checked = game.featured == 1;
             document.getElementById('gameActive').checked = game.is_active == 1;
             
@@ -86,28 +92,18 @@ document.getElementById('gameFormElement').addEventListener('submit', function(e
     e.preventDefault();
     
     const gameId = document.getElementById('gameId').value;
+    const formData = new FormData(this);
     
-    const data = {
-        action: gameId ? 'update' : 'create',
-        name: document.getElementById('gameName').value,
-        description: document.getElementById('gameDescription').value,
-        category_id: document.getElementById('gameCategory').value,
-        image_url: document.getElementById('gameImage').value,
-        background_image: document.getElementById('gameBackground').value,
-        featured: document.getElementById('gameFeatured').checked ? 1 : 0,
-        is_active: document.getElementById('gameActive').checked ? 1 : 0
-    };
+    // Agregar action al FormData
+    formData.append('action', gameId ? 'update' : 'create');
     
-    if (gameId) {
-        data.gameId = gameId;
-    }
+    // Los checkboxes ya se manejan automáticamente con FormData
+    // Si están marcados, se envían con valor '1'
+    // Si no están marcados, no se envían (y el PHP los trata como 0)
     
     fetch('api/games.php', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams(data)
+        body: formData
     })
     .then(response => response.json())
     .then(result => {
@@ -125,7 +121,6 @@ document.getElementById('gameFormElement').addEventListener('submit', function(e
 });
 
 // ========== GESTIÓN DE PRODUCTOS ==========
-
 function loadProductsForGame(gameId) {
     if (!gameId) {
         document.getElementById('productsManagement').style.display = 'none';
@@ -134,7 +129,6 @@ function loadProductsForGame(gameId) {
     
     document.getElementById('productsManagement').style.display = 'block';
     document.getElementById('selectedGameId').value = gameId;
-    
     resetProductForm();
     
     fetch(`api/products.php?action=get_game_products&game_id=${gameId}`)
@@ -158,13 +152,13 @@ function loadProductsForGame(gameId) {
 function updateProductsList(products, game) {
     const productsList = document.getElementById('productsList');
     
-    if (products.length === 0) {
+    if (!products || products.length === 0) {
         productsList.innerHTML = '<p>No hay productos para este juego.</p>';
         return;
     }
     
     let html = `
-        <p><strong>Juego:</strong> ${game.name}</p>
+        <p><strong>Juego:</strong> ${escapeHtml(game.name)}</p>
         <table class="table">
             <thead>
                 <tr>
@@ -216,7 +210,7 @@ function editExistingProduct(productId) {
     fetch(`api/products.php?action=get&id=${productId}`)
         .then(response => response.json())
         .then(result => {
-            if (result.success === false) {
+            if (!result.success) {
                 alert('❌ ' + result.message);
                 return;
             }
@@ -261,13 +255,8 @@ function deleteExistingProduct(productId) {
 function resetProductForm() {
     document.getElementById('productForm').reset();
     document.getElementById('productId').value = '';
+    document.getElementById('productAvailable').checked = true;
     document.getElementById('productFormTitle').textContent = 'Agregar Nuevo Producto';
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
 }
 
 document.getElementById('productForm').addEventListener('submit', function(e) {
@@ -281,26 +270,12 @@ document.getElementById('productForm').addEventListener('submit', function(e) {
         return;
     }
     
-    const data = {
-        action: productId ? 'update' : 'create',
-        game_id: gameId,
-        name: document.getElementById('productName').value,
-        description: document.getElementById('productDescription').value,
-        currency_amount: document.getElementById('productCurrency').value,
-        price: document.getElementById('productPrice').value,
-        is_available: document.getElementById('productAvailable').checked ? 1 : 0
-    };
-    
-    if (productId) {
-        data.productId = productId;
-    }
+    const formData = new FormData(this);
+    formData.append('action', productId ? 'update' : 'create');
     
     fetch('api/products.php', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams(data)
+        body: formData
     })
     .then(response => response.json())
     .then(result => {
@@ -319,7 +294,6 @@ document.getElementById('productForm').addEventListener('submit', function(e) {
 });
 
 // ========== GESTIÓN DE CATEGORÍAS ==========
-
 function showCategoryForm() {
     document.getElementById('categoryForm').style.display = 'block';
     document.getElementById('categoryFormTitle').textContent = 'Agregar Nueva Categoría';
@@ -335,7 +309,7 @@ function editCategory(categoryId) {
     fetch(`api/categories.php?action=get&id=${categoryId}`)
         .then(response => response.json())
         .then(result => {
-            if (result.success === false) {
+            if (!result.success) {
                 alert('❌ ' + result.message);
                 return;
             }
@@ -378,24 +352,12 @@ document.getElementById('categoryFormElement').addEventListener('submit', functi
     e.preventDefault();
     
     const categoryId = document.getElementById('categoryId').value;
-    
-    const data = {
-        action: categoryId ? 'update' : 'create',
-        name: document.getElementById('categoryName').value,
-        description: document.getElementById('categoryDescription').value,
-        icon: document.getElementById('categoryIcon').value
-    };
-    
-    if (categoryId) {
-        data.categoryId = categoryId;
-    }
+    const formData = new FormData(this);
+    formData.append('action', categoryId ? 'update' : 'create');
     
     fetch('api/categories.php', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams(data)
+        body: formData
     })
     .then(response => response.json())
     .then(result => {
@@ -413,7 +375,6 @@ document.getElementById('categoryFormElement').addEventListener('submit', functi
 });
 
 // ========== GESTIÓN DE ADMINISTRADORES ==========
-
 function showAdminForm() {
     document.getElementById('adminForm').style.display = 'block';
     document.getElementById('adminFormTitle').textContent = 'Agregar Nuevo Administrador';
@@ -430,7 +391,7 @@ function editAdmin(adminId) {
     fetch(`api/admins.php?action=get&id=${adminId}`)
         .then(response => response.json())
         .then(result => {
-            if (result.success === false) {
+            if (!result.success) {
                 alert('❌ ' + result.message);
                 return;
             }
@@ -472,29 +433,12 @@ document.getElementById('adminFormElement').addEventListener('submit', function(
     e.preventDefault();
     
     const adminId = document.getElementById('adminId').value;
-    const userId = document.getElementById('adminUserId').value;
-    
-    if (!userId) {
-        alert('❌ Por favor selecciona un usuario');
-        return;
-    }
-    
-    const data = {
-        action: adminId ? 'update' : 'create',
-        user_id: userId,
-        role: document.getElementById('adminRole').value
-    };
-    
-    if (adminId) {
-        data.adminId = adminId;
-    }
+    const formData = new FormData(this);
+    formData.append('action', adminId ? 'update' : 'create');
     
     fetch('api/admins.php', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams(data)
+        body: formData
     })
     .then(response => response.json())
     .then(result => {
@@ -510,3 +454,10 @@ document.getElementById('adminFormElement').addEventListener('submit', function(
         alert('❌ Error de conexión');
     });
 });
+
+// Utilidad
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}

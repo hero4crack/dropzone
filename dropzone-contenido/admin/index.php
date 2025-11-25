@@ -220,6 +220,24 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
             margin-right: 10px;
             vertical-align: middle;
         }
+
+        .checkbox-group {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
     </style>
 </head>
 <body>
@@ -251,7 +269,7 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
             <div class="nav-item" onclick="window.location.href='../index.php'">
                 <i class="fas fa-eye"></i>Ver Tienda
             </div>
-            <div class="nav-item" onclick="window.location.href='../../../dropzone-login/logout.php'">
+            <div class="nav-item" onclick="window.location.href='../../dropzone-login/logout.php'">
                 <i class="fas fa-sign-out-alt"></i>Cerrar Sesión
             </div>
         </div>
@@ -308,7 +326,7 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
                 <div id="gameForm" class="card" style="display: none;">
                     <h3 id="gameFormTitle">Agregar Nuevo Juego</h3>
                     <form id="gameFormElement" enctype="multipart/form-data">
-                        <input type="hidden" id="gameId" name="gameId">
+                        <input type="hidden" id="gameId" name="gameId" value="">
                         <div class="form-group">
                             <label>Nombre del Juego</label>
                             <input type="text" id="gameName" name="name" class="form-control" required>
@@ -337,14 +355,21 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
                             <label>Imagen de Fondo</label>
                             <input type="text" id="gameBackground" name="background_image" class="form-control" placeholder="https://ejemplo.com/fondo.jpg">
                         </div>
+                        
+                        <!-- CHECKBOXES CORREGIDOS -->
                         <div class="form-group">
-                            <label>
-                                <input type="checkbox" id="gameFeatured" name="featured"> Destacado
-                            </label>
-                            <label>
-                                <input type="checkbox" id="gameActive" name="is_active" checked> Activo
-                            </label>
+                            <div class="checkbox-group">
+                                <label>
+                                    <input type="checkbox" id="gameFeatured" name="featured" value="1">
+                                    Destacado
+                                </label>
+                                <label>
+                                    <input type="checkbox" id="gameActive" name="is_active" value="1" checked>
+                                    Activo
+                                </label>
+                            </div>
                         </div>
+                        
                         <button type="submit" class="btn">Guardar Juego</button>
                         <button type="button" class="btn" onclick="hideGameForm()" style="background: var(--medium-gray);">Cancelar</button>
                     </form>
@@ -400,83 +425,83 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
                 </div>
             </div>
             
-           <!-- Gestión de Productos -->
-<div id="products" class="tab-content">
-    <h2>Gestión de Productos y Precios</h2>
-    
-    <!-- Selector de Juegos -->
-    <div class="card">
-        <h3>Seleccionar Juego</h3>
-        <div class="form-group">
-            <label>Elige un juego para gestionar sus productos:</label>
-            <select id="gameSelector" class="form-control" onchange="loadProductsForGame(this.value)">
-                <option value="">-- Selecciona un juego --</option>
-                <?php
-                $stmt = $db->query("SELECT id, name FROM games ORDER BY name");
-                while ($game = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    echo "<option value='{$game['id']}'>{$game['name']}</option>";
-                }
-                ?>
-            </select>
-        </div>
-    </div>
-
-    <!-- Gestión de Productos (se muestra cuando se selecciona un juego) -->
-    <div id="productsManagement" style="display: none;">
-        <!-- Formulario para agregar/editar producto -->
-        <div class="card">
-            <h3 id="productFormTitle">Agregar Nuevo Producto</h3>
-            <form id="productForm">
-                <input type="hidden" id="productId" name="productId">
-                <input type="hidden" id="selectedGameId" name="game_id">
+            <!-- Gestión de Productos -->
+            <div id="products" class="tab-content">
+                <h2>Gestión de Productos y Precios</h2>
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <!-- Selector de Juegos -->
+                <div class="card">
+                    <h3>Seleccionar Juego</h3>
                     <div class="form-group">
-                        <label>Nombre del Producto</label>
-                        <input type="text" id="productName" name="name" class="form-control" required 
-                               placeholder="Ej: CP, Cristales, Diamantes. etc.">
-                    </div>
-                    <div class="form-group">
-                        <label>Descripción</label>
-                        <input type="text" id="productDescription" name="description" class="form-control"
-                               placeholder="Ej: Paquete de monedas básico, Pase de Batalla, etc.">
-                    </div>
-                    <div class="form-group">
-                        <label>Cantidad (Cuanto recibira el cliente)</label>
-                        <input type="text" id="productCurrency" name="currency_amount" class="form-control" required
-                               placeholder="Ej: 1000, 5000, 10000">
-                    </div>
-                    <div class="form-group">
-                        <label>Precio (Bs.)</label>
-                        <input type="number" id="productPrice" name="price" class="form-control" step="0.01" required
-                               placeholder="Ej: 5.00, 10.00, 18.00">
+                        <label>Elige un juego para gestionar sus productos:</label>
+                        <select id="gameSelector" class="form-control" onchange="loadProductsForGame(this.value)">
+                            <option value="">-- Selecciona un juego --</option>
+                            <?php
+                            $stmt = $db->query("SELECT id, name FROM games ORDER BY name");
+                            while ($game = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                                echo "<option value='{$game['id']}'>{$game['name']}</option>";
+                            }
+                            ?>
+                        </select>
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="productAvailable" name="is_available" checked> Producto disponible
-                    </label>
-                </div>
-                
-                <button type="submit" class="btn">
-                    <i class="fas fa-save"></i> Guardar Producto
-                </button>
-                <button type="button" class="btn" onclick="resetProductForm()" style="background: var(--medium-gray);">
-                    <i class="fas fa-times"></i> Cancelar
-                </button>
-            </form>
-        </div>
 
-        <!-- Lista de productos existentes -->
-        <div class="card">
-            <h3>Productos del Juego</h3>
-            <div id="productsList">
-                <p>No hay productos para este juego.</p>
+                <!-- Gestión de Productos -->
+                <div id="productsManagement" style="display: none;">
+                    <!-- Formulario para agregar/editar producto -->
+                    <div class="card">
+                        <h3 id="productFormTitle">Agregar Nuevo Producto</h3>
+                        <form id="productForm">
+                            <input type="hidden" id="productId" name="productId" value="">
+                            <input type="hidden" id="selectedGameId" name="game_id" value="">
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label>Nombre del Producto</label>
+                                    <input type="text" id="productName" name="name" class="form-control" required 
+                                           placeholder="Ej: CP, Cristales, Diamantes. etc.">
+                                </div>
+                                <div class="form-group">
+                                    <label>Descripción</label>
+                                    <input type="text" id="productDescription" name="description" class="form-control"
+                                           placeholder="Ej: Paquete de monedas básico, Pase de Batalla, etc.">
+                                </div>
+                                <div class="form-group">
+                                    <label>Cantidad (Cuanto recibira el cliente)</label>
+                                    <input type="text" id="productCurrency" name="currency_amount" class="form-control" required
+                                           placeholder="Ej: 1000, 5000, 10000">
+                                </div>
+                                <div class="form-group">
+                                    <label>Precio (Bs.)</label>
+                                    <input type="number" id="productPrice" name="price" class="form-control" step="0.01" required
+                                           placeholder="Ej: 5.00, 10.00, 18.00">
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>
+                                    <input type="checkbox" id="productAvailable" name="is_available" value="1" checked> Producto disponible
+                                </label>
+                            </div>
+                            
+                            <button type="submit" class="btn">
+                                <i class="fas fa-save"></i> Guardar Producto
+                            </button>
+                            <button type="button" class="btn" onclick="resetProductForm()" style="background: var(--medium-gray);">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Lista de productos existentes -->
+                    <div class="card">
+                        <h3>Productos del Juego</h3>
+                        <div id="productsList">
+                            <p>No hay productos para este juego.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-</div>
             
             <!-- Gestión de Categorías -->
             <div id="categories" class="tab-content">
@@ -488,7 +513,7 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
                 <div id="categoryForm" class="card" style="display: none;">
                     <h3 id="categoryFormTitle">Agregar Nueva Categoría</h3>
                     <form id="categoryFormElement">
-                        <input type="hidden" id="categoryId" name="categoryId">
+                        <input type="hidden" id="categoryId" name="categoryId" value="">
                         <div class="form-group">
                             <label>Nombre de la Categoría</label>
                             <input type="text" id="categoryName" name="name" class="form-control" required>
@@ -548,7 +573,7 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
                 </div>
             </div>
 
-            <!-- Gestión de Administradores (Solo para super_admins) -->
+            <!-- Gestión de Administradores -->
             <?php if ($isSuperAdmin): ?>
             <div id="admins" class="tab-content">
                 <h2>Gestión de Administradores</h2>
@@ -561,7 +586,7 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
                 <div id="adminForm" class="card" style="display: none;">
                     <h3 id="adminFormTitle">Agregar Nuevo Administrador</h3>
                     <form id="adminFormElement">
-                        <input type="hidden" id="adminId" name="adminId">
+                        <input type="hidden" id="adminId" name="adminId" value="">
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                             <div class="form-group">
@@ -644,7 +669,6 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
                                             <i class='fas fa-edit'></i>
                                         </button>";
                                 
-                                // No permitir eliminarse a sí mismo
                                 if ($adminRow['user_id'] != $user['id']) {
                                     echo "
                                         <button class='action-btn' onclick='deleteAdmin({$adminRow['id']})' title='Eliminar'>

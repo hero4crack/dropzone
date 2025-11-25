@@ -238,6 +238,205 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
             width: 18px;
             height: 18px;
         }
+
+        /* ========== ESTILOS PARA MODALES ========== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    backdrop-filter: blur(5px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.modal {
+    background: var(--dark-gray);
+    border: 2px solid var(--gold);
+    border-radius: 12px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 450px;
+    color: var(--white);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+    transform: translateY(-30px) scale(0.9);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.modal-overlay.active .modal {
+    transform: translateY(0) scale(1);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--medium-gray);
+}
+
+.modal-icon {
+    font-size: 1.8rem;
+    margin-right: 1rem;
+    width: 30px;
+    text-align: center;
+}
+
+.modal-success .modal-icon {
+    color: #48bb78;
+}
+
+.modal-error .modal-icon {
+    color: #e53e3e;
+}
+
+.modal-warning .modal-icon {
+    color: #ed8936;
+}
+
+.modal-info .modal-icon {
+    color: var(--gold);
+}
+
+.modal-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--white);
+    font-family: 'Orbitron', sans-serif;
+}
+
+.modal-body {
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.modal-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.9rem;
+    min-width: 80px;
+}
+
+.modal-btn-primary {
+    background: var(--gold);
+    color: var(--black);
+}
+
+.modal-btn-primary:hover {
+    background: var(--white);
+    transform: translateY(-2px);
+}
+
+.modal-btn-secondary {
+    background: var(--medium-gray);
+    color: var(--white);
+}
+
+.modal-btn-secondary:hover {
+    background: #4a5568;
+    transform: translateY(-2px);
+}
+
+.modal-btn-danger {
+    background: #e53e3e;
+    color: var(--white);
+}
+
+.modal-btn-danger:hover {
+    background: #c53030;
+    transform: translateY(-2px);
+}
+
+/* Modal de confirmación específico */
+.confirm-modal .modal-body {
+    text-align: center;
+    padding: 1rem 0;
+    font-size: 1.1rem;
+}
+
+.confirm-modal .modal-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+    width: 100%;
+}
+
+.confirm-modal .modal-title {
+    text-align: center;
+    width: 100%;
+}
+
+/* Close button */
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.modal-close:hover {
+    background: var(--medium-gray);
+    color: var(--gold);
+}
+
+/* Loading states */
+.btn.loading {
+    position: relative;
+    color: transparent;
+}
+
+.btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid transparent;
+    border-top-color: var(--black);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
     </style>
 </head>
 <body>
@@ -691,6 +890,680 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
         </div>
     </div>
 
-    <script src="admin.js"></script>
+     <!-- SCRIPT COMPLETAMENTE NUEVO -->
+    <script>
+    // ========== SISTEMA DE MODALES ==========
+    class ModalSystem {
+        constructor() {
+            this.modals = new Map();
+        }
+
+        show(message, type = 'info', title = null) {
+            return new Promise((resolve) => {
+                const modalId = 'modal-' + Date.now();
+                const modal = this.createModal(modalId, message, type, title, resolve);
+                document.body.appendChild(modal);
+                
+                setTimeout(() => {
+                    modal.classList.add('active');
+                }, 10);
+                
+                this.modals.set(modalId, { element: modal, resolve });
+            });
+        }
+
+        confirm(message, title = 'Confirmar acción') {
+            return new Promise((resolve) => {
+                const modalId = 'modal-' + Date.now();
+                const modal = this.createConfirmModal(modalId, message, title, resolve);
+                document.body.appendChild(modal);
+                
+                setTimeout(() => {
+                    modal.classList.add('active');
+                }, 10);
+                
+                this.modals.set(modalId, { element: modal, resolve });
+            });
+        }
+
+        createModal(modalId, message, type, title, resolve) {
+            const titles = {
+                'success': 'Éxito',
+                'error': 'Error', 
+                'warning': 'Advertencia',
+                'info': 'Información'
+            };
+
+            const icons = {
+                'success': 'fas fa-check-circle',
+                'error': 'fas fa-times-circle',
+                'warning': 'fas fa-exclamation-triangle', 
+                'info': 'fas fa-info-circle'
+            };
+
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'modal-overlay';
+            modalOverlay.innerHTML = `
+                <div class="modal modal-${type}">
+                    <button class="modal-close" onclick="modalSystem.close('${modalId}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="modal-header">
+                        <i class="modal-icon ${icons[type]}"></i>
+                        <div class="modal-title">${title || titles[type]}</div>
+                    </div>
+                    <div class="modal-body">
+                        ${this.escapeHtml(message)}
+                    </div>
+                    <div class="modal-footer">
+                        <button class="modal-btn modal-btn-primary" onclick="modalSystem.close('${modalId}')">
+                            Aceptar
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    this.close(modalId);
+                }
+            });
+
+            return modalOverlay;
+        }
+
+        createConfirmModal(modalId, message, title, resolve) {
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'modal-overlay';
+            modalOverlay.innerHTML = `
+                <div class="modal">
+                    <button class="modal-close" onclick="modalSystem.close('${modalId}', false)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="modal-header">
+                        <i class="modal-icon fas fa-question-circle"></i>
+                        <div class="modal-title">${title}</div>
+                    </div>
+                    <div class="modal-body">
+                        ${this.escapeHtml(message)}
+                    </div>
+                    <div class="modal-footer">
+                        <button class="modal-btn modal-btn-secondary" onclick="modalSystem.close('${modalId}', false)">
+                            Cancelar
+                        </button>
+                        <button class="modal-btn modal-btn-danger" onclick="modalSystem.close('${modalId}', true)">
+                            Confirmar
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    this.close(modalId, false);
+                }
+            });
+
+            return modalOverlay;
+        }
+
+        close(modalId, result = true) {
+            const modalData = this.modals.get(modalId);
+            if (modalData) {
+                const { element, resolve } = modalData;
+                
+                element.classList.remove('active');
+                
+                setTimeout(() => {
+                    element.remove();
+                    this.modals.delete(modalId);
+                    if (resolve) resolve(result);
+                }, 300);
+            }
+        }
+
+        escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    }
+
+    // Instancia global
+    const modalSystem = new ModalSystem();
+
+    // Funciones helper
+    async function showSuccess(message) {
+        await modalSystem.show(message, 'success');
+    }
+
+    async function showError(message) {
+        await modalSystem.show(message, 'error');
+    }
+
+    async function showWarning(message) {
+        await modalSystem.show(message, 'warning');
+    }
+
+    async function showInfo(message) {
+        await modalSystem.show(message, 'info');
+    }
+
+    function setLoading(button, loading) {
+        if (loading) {
+            button.disabled = true;
+            button.classList.add('loading');
+        } else {
+            button.disabled = false;
+            button.classList.remove('loading');
+        }
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // ========== NAVEGACIÓN ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        // Navegación entre pestañas
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                if (this.dataset.tab) {
+                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab).classList.add('active');
+                }
+            });
+        });
+
+        // Cerrar modales con ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modals = document.querySelectorAll('.modal-overlay.active');
+                if (modals.length > 0) {
+                    const lastModal = modals[modals.length - 1];
+                    const modalId = Array.from(modalSystem.modals.entries())
+                        .find(([id, data]) => data.element === lastModal)?.[0];
+                    if (modalId) modalSystem.close(modalId);
+                }
+            }
+        });
+
+        console.log('✅ Sistema de modales inicializado');
+    });
+
+    // ========== GESTIÓN DE JUEGOS ==========
+    function showGameForm() {
+        document.getElementById('gameForm').style.display = 'block';
+        document.getElementById('gameFormTitle').textContent = 'Agregar Nuevo Juego';
+        document.getElementById('gameFormElement').reset();
+        document.getElementById('gameId').value = '';
+        document.getElementById('gameFeatured').checked = false;
+        document.getElementById('gameActive').checked = true;
+    }
+
+    function hideGameForm() {
+        document.getElementById('gameForm').style.display = 'none';
+    }
+
+    async function editGame(gameId) {
+        try {
+            const response = await fetch(`api/games.php?action=get&id=${gameId}`);
+            const result = await response.json();
+            
+            if (!result.success) {
+                await showError(result.message);
+                return;
+            }
+            
+            const game = result.data;
+            document.getElementById('gameId').value = game.id;
+            document.getElementById('gameName').value = game.name;
+            document.getElementById('gameDescription').value = game.description || '';
+            document.getElementById('gameCategory').value = game.category_id;
+            document.getElementById('gameImage').value = game.image_url || '';
+            document.getElementById('gameBackground').value = game.background_image || '';
+            document.getElementById('gameFeatured').checked = game.featured == 1;
+            document.getElementById('gameActive').checked = game.is_active == 1;
+            
+            document.getElementById('gameFormTitle').textContent = 'Editar Juego';
+            document.getElementById('gameForm').style.display = 'block';
+        } catch (error) {
+            console.error('Error:', error);
+            await showError('Error al cargar el juego');
+        }
+    }
+
+    async function deleteGame(gameId) {
+        const confirmed = await modalSystem.confirm(
+            '¿Estás seguro de que quieres eliminar este juego? También se eliminarán todos sus productos.',
+            'Eliminar Juego'
+        );
+        
+        if (confirmed) {
+            try {
+                const response = await fetch(`api/games.php?action=delete&id=${gameId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    await showSuccess(result.message);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    await showError(result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                await showError('Error al eliminar el juego');
+            }
+        }
+    }
+
+    // Formulario de juegos
+    document.getElementById('gameFormElement').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitButton = this.querySelector('button[type="submit"]');
+        const gameId = document.getElementById('gameId').value;
+        const formData = new FormData(this);
+        formData.append('action', gameId ? 'update' : 'create');
+        
+        setLoading(submitButton, true);
+        
+        try {
+            const response = await fetch('api/games.php', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                await showSuccess(result.message);
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                await showError(result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            await showError('Error de conexión');
+        } finally {
+            setLoading(submitButton, false);
+        }
+    });
+
+    // ========== GESTIÓN DE PRODUCTOS ==========
+    function loadProductsForGame(gameId) {
+        if (!gameId) {
+            document.getElementById('productsManagement').style.display = 'none';
+            return;
+        }
+        
+        document.getElementById('productsManagement').style.display = 'block';
+        document.getElementById('selectedGameId').value = gameId;
+        resetProductForm();
+        
+        fetch(`api/products.php?action=get_game_products&game_id=${gameId}`)
+            .then(response => response.json())
+            .then(result => {
+                if (!result.success) {
+                    document.getElementById('productsList').innerHTML = 
+                        `<p style="color: #e53e3e;">Error: ${result.message}</p>`;
+                    return;
+                }
+                updateProductsList(result.products, result.game);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('productsList').innerHTML = 
+                    '<p style="color: #e53e3e;">Error de conexión</p>';
+            });
+    }
+
+    function updateProductsList(products, game) {
+        const container = document.getElementById('productsList');
+        
+        if (!products || products.length === 0) {
+            container.innerHTML = '<p>No hay productos para este juego.</p>';
+            return;
+        }
+        
+        let html = `
+            <p><strong>Juego:</strong> ${escapeHtml(game.name)}</p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        products.forEach(product => {
+            const status = product.is_available ? 
+                '<span style="color: #48bb78;">✅ Disponible</span>' : 
+                '<span style="color: #e53e3e;">❌ No disponible</span>';
+            
+            html += `
+                <tr>
+                    <td>
+                        <strong>${escapeHtml(product.name)}</strong><br>
+                        <small style="color: #888;">${escapeHtml(product.description || 'Sin descripción')}</small>
+                    </td>
+                    <td><strong>${escapeHtml(product.currency_amount)}</strong></td>
+                    <td><strong style="color: var(--gold);">${parseFloat(product.price).toFixed(2)} Bs.</strong></td>
+                    <td>${status}</td>
+                    <td>
+                        <button class="action-btn" onclick="editExistingProduct(${product.id})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn" onclick="deleteExistingProduct(${product.id})" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        html += `</tbody></table>`;
+        container.innerHTML = html;
+    }
+
+    async function editExistingProduct(productId) {
+        try {
+            const response = await fetch(`api/products.php?action=get&id=${productId}`);
+            const result = await response.json();
+            
+            if (!result.success) {
+                await showError(result.message);
+                return;
+            }
+            
+            const product = result.data;
+            document.getElementById('productId').value = product.id;
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productDescription').value = product.description || '';
+            document.getElementById('productCurrency').value = product.currency_amount;
+            document.getElementById('productPrice').value = product.price;
+            document.getElementById('productAvailable').checked = product.is_available == 1;
+            
+            document.getElementById('productFormTitle').textContent = 'Editar Producto';
+        } catch (error) {
+            console.error('Error:', error);
+            await showError('Error al cargar el producto');
+        }
+    }
+
+    async function deleteExistingProduct(productId) {
+        const confirmed = await modalSystem.confirm(
+            '¿Estás seguro de que quieres eliminar este producto?',
+            'Eliminar Producto'
+        );
+        
+        if (confirmed) {
+            try {
+                const response = await fetch(`api/products.php?action=delete&id=${productId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    await showSuccess(result.message);
+                    const gameId = document.getElementById('selectedGameId').value;
+                    loadProductsForGame(gameId);
+                } else {
+                    await showError(result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                await showError('Error al eliminar el producto');
+            }
+        }
+    }
+
+    function resetProductForm() {
+        document.getElementById('productForm').reset();
+        document.getElementById('productId').value = '';
+        document.getElementById('productAvailable').checked = true;
+        document.getElementById('productFormTitle').textContent = 'Agregar Nuevo Producto';
+    }
+
+    document.getElementById('productForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitButton = this.querySelector('button[type="submit"]');
+        const productId = document.getElementById('productId').value;
+        const gameId = document.getElementById('selectedGameId').value;
+        
+        if (!gameId) {
+            await showError('Primero selecciona un juego');
+            return;
+        }
+        
+        const formData = new FormData(this);
+        formData.append('action', productId ? 'update' : 'create');
+        
+        setLoading(submitButton, true);
+        
+        try {
+            const response = await fetch('api/products.php', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                await showSuccess(result.message);
+                resetProductForm();
+                loadProductsForGame(gameId);
+            } else {
+                await showError(result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            await showError('Error de conexión');
+        } finally {
+            setLoading(submitButton, false);
+        }
+    });
+
+    // ========== GESTIÓN DE CATEGORÍAS ==========
+    function showCategoryForm() {
+        document.getElementById('categoryForm').style.display = 'block';
+        document.getElementById('categoryFormTitle').textContent = 'Agregar Nueva Categoría';
+        document.getElementById('categoryFormElement').reset();
+        document.getElementById('categoryId').value = '';
+    }
+
+    function hideCategoryForm() {
+        document.getElementById('categoryForm').style.display = 'none';
+    }
+
+    async function editCategory(categoryId) {
+        try {
+            const response = await fetch(`api/categories.php?action=get&id=${categoryId}`);
+            const result = await response.json();
+            
+            if (!result.success) {
+                await showError(result.message);
+                return;
+            }
+            
+            const category = result.data;
+            document.getElementById('categoryId').value = category.id;
+            document.getElementById('categoryName').value = category.name;
+            document.getElementById('categoryDescription').value = category.description || '';
+            document.getElementById('categoryIcon').value = category.icon || '';
+            
+            document.getElementById('categoryFormTitle').textContent = 'Editar Categoría';
+            document.getElementById('categoryForm').style.display = 'block';
+        } catch (error) {
+            console.error('Error:', error);
+            await showError('Error al cargar la categoría');
+        }
+    }
+
+    async function deleteCategory(categoryId) {
+        const confirmed = await modalSystem.confirm(
+            '¿Estás seguro de que quieres eliminar esta categoría?',
+            'Eliminar Categoría'
+        );
+        
+        if (confirmed) {
+            try {
+                const response = await fetch(`api/categories.php?action=delete&id=${categoryId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    await showSuccess(result.message);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    await showError(result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                await showError('Error al eliminar la categoría');
+            }
+        }
+    }
+
+    document.getElementById('categoryFormElement').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitButton = this.querySelector('button[type="submit"]');
+        const categoryId = document.getElementById('categoryId').value;
+        const formData = new FormData(this);
+        formData.append('action', categoryId ? 'update' : 'create');
+        
+        setLoading(submitButton, true);
+        
+        try {
+            const response = await fetch('api/categories.php', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                await showSuccess(result.message);
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                await showError(result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            await showError('Error de conexión');
+        } finally {
+            setLoading(submitButton, false);
+        }
+    });
+
+    // ========== GESTIÓN DE ADMINS ==========
+    function showAdminForm() {
+        document.getElementById('adminForm').style.display = 'block';
+        document.getElementById('adminFormTitle').textContent = 'Agregar Nuevo Administrador';
+        document.getElementById('adminFormElement').reset();
+        document.getElementById('adminId').value = '';
+        document.getElementById('adminRole').value = 'admin';
+    }
+
+    function hideAdminForm() {
+        document.getElementById('adminForm').style.display = 'none';
+    }
+
+    async function editAdmin(adminId) {
+        try {
+            const response = await fetch(`api/admins.php?action=get&id=${adminId}`);
+            const result = await response.json();
+            
+            if (!result.success) {
+                await showError(result.message);
+                return;
+            }
+            
+            const admin = result.data;
+            document.getElementById('adminId').value = admin.id;
+            document.getElementById('adminUserId').value = admin.user_id;
+            document.getElementById('adminRole').value = admin.role;
+            
+            document.getElementById('adminFormTitle').textContent = 'Editar Administrador';
+            document.getElementById('adminForm').style.display = 'block';
+        } catch (error) {
+            console.error('Error:', error);
+            await showError('Error al cargar el administrador');
+        }
+    }
+
+    async function deleteAdmin(adminId) {
+        const confirmed = await modalSystem.confirm(
+            '¿Estás seguro de que quieres eliminar este administrador?',
+            'Eliminar Administrador'
+        );
+        
+        if (confirmed) {
+            try {
+                const response = await fetch(`api/admins.php?action=delete&id=${adminId}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    await showSuccess(result.message);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    await showError(result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                await showError('Error al eliminar el administrador');
+            }
+        }
+    }
+
+    document.getElementById('adminFormElement').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitButton = this.querySelector('button[type="submit"]');
+        const adminId = document.getElementById('adminId').value;
+        const formData = new FormData(this);
+        formData.append('action', adminId ? 'update' : 'create');
+        
+        setLoading(submitButton, true);
+        
+        try {
+            const response = await fetch('api/admins.php', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                await showSuccess(result.message);
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                await showError(result.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            await showError('Error de conexión');
+        } finally {
+            setLoading(submitButton, false);
+        }
+    });
+
+    // Función para gestionar productos desde juegos
+    function manageProducts(gameId) {
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        document.querySelector('[data-tab="products"]').classList.add('active');
+        document.getElementById('products').classList.add('active');
+        
+        document.getElementById('gameSelector').value = gameId;
+        loadProductsForGame(gameId);
+    }
+    </script>
 </body>
 </html>

@@ -147,26 +147,7 @@ foreach ($allGames as $game) {
             </div>
         </section>
         
-        <!-- Categorías Principales -->
-        <section class="categories" id="categories">
-            <div class="container">
-                <h2 class="section-title">Categorías Principales</h2>
-                <div class="category-grid">
-                    <?php foreach ($categories as $category): ?>
-                        <div class="category-card">
-                            <div class="category-icon">
-                                <i class="<?php echo $category['icon'] ?: 'fas fa-gamepad'; ?>"></i>
-                            </div>
-                            <h3><?php echo htmlspecialchars($category['name']); ?></h3>
-                            <p><?php echo htmlspecialchars($category['description'] ?: 'Descubre los mejores juegos'); ?></p>
-                            <div class="category-count"><?php echo $category['game_count']; ?> juegos</div>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-        </section>
-        
-        <!-- Juegos por Categoría - VERSIÓN CORREGIDA -->
+        <!-- Juegos por Categoría - VERSIÓN COMPACTA CON SCROLL HORIZONTAL -->
         <section class="products" id="products">
             <div class="container">
                 <?php 
@@ -191,28 +172,24 @@ foreach ($allGames as $game) {
                                     <i class="<?php echo $categoryData['category']['category_icon'] ?: 'fas fa-gamepad'; ?>"></i>
                                     <?php echo htmlspecialchars($categoryData['category']['category_name']); ?>
                                 </h2>
-                                <a href="#categories" class="view-all">Ver Todas las Categorías</a>
                             </div>
                             
-                            <!-- GRID DE JUEGOS COMPACTO - SOLO IMAGEN Y NOMBRE -->
-                            <div class="games-grid-compact">
-                                <?php foreach ($categoryData['games'] as $item): ?>
-                                    <a href="game-prices.php?game_id=<?php echo $item['game']['id']; ?>" class="game-card-compact" id="game-<?php echo $item['game']['id']; ?>">
-                                        <div class="game-image-container">
-                                            <div class="game-image" style="background-image: url('<?php echo !empty($item['game']['image_url']) ? htmlspecialchars($item['game']['image_url']) : 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'; ?>')">
-                                                <?php if ($item['game']['featured']): ?>
-                                                    <div class="hot-badge">HOT</div>
-                                                <?php endif; ?>
-                                            </div>
-                                            <div class="game-overlay">
-                                                <div class="game-name"><?php echo htmlspecialchars($item['game']['name']); ?></div>
-                                                <div class="game-actions">
-                                                    <span class="btn-view-prices">Ver Precios</span>
+                            <!-- GRID DE JUEGOS COMPACTO CON SCROLL HORIZONTAL -->
+                            <div class="games-scroll-container">
+                                <div class="games-scroll-wrapper">
+                                    <?php foreach ($categoryData['games'] as $item): ?>
+                                        <a href="game-prices.php?game_id=<?php echo $item['game']['id']; ?>" class="game-card-compact" id="game-<?php echo $item['game']['id']; ?>">
+                                            <div class="game-image-container">
+                                                <div class="game-image" style="background-image: url('<?php echo !empty($item['game']['image_url']) ? htmlspecialchars($item['game']['image_url']) : 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80'; ?>')">
+                                                    <?php if ($item['game']['featured']): ?>
+                                                        <div class="hot-badge">HOT</div>
+                                                    <?php endif; ?>
                                                 </div>
+                                                <div class="game-name"><?php echo htmlspecialchars($item['game']['name']); ?></div>
                                             </div>
-                                        </div>
-                                    </a>
-                                <?php endforeach; ?>
+                                        </a>
+                                    <?php endforeach; ?>
+                                </div>
                             </div>
                         </div>
                     <?php endif; ?>
@@ -350,5 +327,181 @@ foreach ($allGames as $game) {
             });
         });
     </script>
+
+    <style>
+        /* Estilos adicionales para el scroll horizontal de juegos */
+        .games-scroll-container {
+            overflow-x: auto;
+            padding: 15px 0;
+            margin: 0 -10px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold) var(--border-color);
+        }
+
+        .games-scroll-wrapper {
+            display: flex;
+            gap: 15px;
+            padding: 0 10px;
+            min-width: min-content;
+        }
+
+        .game-card-compact {
+            flex: 0 0 auto;
+            width: 160px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.3s ease;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-card-compact:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(233, 69, 96, 0.15);
+        }
+
+        .game-card-compact .game-image-container {
+            position: relative;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-card-compact .game-image {
+            width: 100%;
+            height: 100px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .game-card-compact .hot-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            z-index: 2;
+        }
+
+        .game-card-compact .game-name {
+            padding: 12px 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-color);
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.3;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* Scrollbar personalizada */
+        .games-scroll-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .games-scroll-container::-webkit-scrollbar-track {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+
+        .games-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 3px;
+        }
+
+        .games-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #d4af37;
+        }
+
+        /* Responsive mejorado para móviles */
+        @media (max-width: 768px) {
+            .games-scroll-container {
+                padding: 10px 0;
+                margin: 0 -5px;
+            }
+
+            .games-scroll-wrapper {
+                gap: 12px;
+                padding: 0 5px;
+            }
+
+            .game-card-compact {
+                width: 140px;
+            }
+            
+            .game-card-compact .game-image {
+                height: 90px;
+            }
+            
+            .game-card-compact .game-name {
+                font-size: 13px;
+                padding: 10px 6px;
+                min-height: 45px;
+                line-height: 1.2;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-card-compact {
+                width: 130px;
+            }
+            
+            .game-card-compact .game-image {
+                height: 85px;
+            }
+
+            .game-card-compact .game-name {
+                font-size: 12px;
+                padding: 8px 4px;
+                min-height: 40px;
+            }
+
+            .games-scroll-wrapper {
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .game-card-compact {
+                width: 120px;
+            }
+            
+            .game-card-compact .game-image {
+                height: 80px;
+            }
+
+            .game-card-compact .game-name {
+                font-size: 11px;
+                padding: 8px 3px;
+                min-height: 38px;
+            }
+        }
+
+        /* Asegurar que el texto se muestre completo */
+        .game-card-compact .game-name {
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            text-overflow: ellipsis;
+        }
+    </style>
 </body>
 </html>

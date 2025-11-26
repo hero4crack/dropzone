@@ -240,203 +240,201 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
         }
 
         /* ========== ESTILOS PARA MODALES ========== */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 10000;
-    backdrop-filter: blur(5px);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
 
-.modal-overlay.active {
-    display: flex;
-    opacity: 1;
-}
+        .modal-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
 
-.modal {
-    background: var(--dark-gray);
-    border: 2px solid var(--gold);
-    border-radius: 12px;
-    padding: 2rem;
-    width: 90%;
-    max-width: 450px;
-    color: var(--white);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
-    transform: translateY(-30px) scale(0.9);
-    transition: all 0.3s ease;
-    position: relative;
-}
+        .modal {
+            background: var(--dark-gray);
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 450px;
+            color: var(--white);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            transform: translateY(-30px) scale(0.9);
+            transition: all 0.3s ease;
+            position: relative;
+        }
 
-.modal-overlay.active .modal {
-    transform: translateY(0) scale(1);
-}
+        .modal-overlay.active .modal {
+            transform: translateY(0) scale(1);
+        }
 
-.modal-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--medium-gray);
-}
+        .modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--medium-gray);
+        }
 
-.modal-icon {
-    font-size: 1.8rem;
-    margin-right: 1rem;
-    width: 30px;
-    text-align: center;
-}
+        .modal-icon {
+            font-size: 1.8rem;
+            margin-right: 1rem;
+            width: 30px;
+            text-align: center;
+        }
 
-.modal-success .modal-icon {
-    color: #48bb78;
-}
+        .modal-success .modal-icon {
+            color: #48bb78;
+        }
 
-.modal-error .modal-icon {
-    color: #e53e3e;
-}
+        .modal-error .modal-icon {
+            color: #e53e3e;
+        }
 
-.modal-warning .modal-icon {
-    color: #ed8936;
-}
+        .modal-warning .modal-icon {
+            color: #ed8936;
+        }
 
-.modal-info .modal-icon {
-    color: var(--gold);
-}
+        .modal-info .modal-icon {
+            color: var(--gold);
+        }
 
-.modal-title {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: var(--white);
-    font-family: 'Orbitron', sans-serif;
-}
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--white);
+            font-family: 'Orbitron', sans-serif;
+        }
 
-.modal-body {
-    margin-bottom: 2rem;
-    line-height: 1.6;
-    font-size: 1rem;
-}
+        .modal-body {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
 
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-}
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
 
-.modal-btn {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s;
-    font-family: 'Exo 2', sans-serif;
-    font-size: 0.9rem;
-    min-width: 80px;
-}
+        .modal-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 0.9rem;
+            min-width: 80px;
+        }
 
-.modal-btn-primary {
-    background: var(--gold);
-    color: var(--black);
-}
+        .modal-btn-primary {
+            background: var(--gold);
+            color: var(--black);
+        }
 
-.modal-btn-primary:hover {
-    background: var(--white);
-    transform: translateY(-2px);
-}
+        .modal-btn-primary:hover {
+            background: var(--white);
+            transform: translateY(-2px);
+        }
 
-.modal-btn-secondary {
-    background: var(--medium-gray);
-    color: var(--white);
-}
+        .modal-btn-secondary {
+            background: var(--medium-gray);
+            color: var(--white);
+        }
 
-.modal-btn-secondary:hover {
-    background: #4a5568;
-    transform: translateY(-2px);
-}
+        .modal-btn-secondary:hover {
+            background: #4a5568;
+            transform: translateY(-2px);
+        }
 
-.modal-btn-danger {
-    background: #e53e3e;
-    color: var(--white);
-}
+        .modal-btn-danger {
+            background: #e53e3e;
+            color: var(--white);
+        }
 
-.modal-btn-danger:hover {
-    background: #c53030;
-    transform: translateY(-2px);
-}
+        .modal-btn-danger:hover {
+            background: #c53030;
+            transform: translateY(-2px);
+        }
 
-/* Modal de confirmación específico */
-.confirm-modal .modal-body {
-    text-align: center;
-    padding: 1rem 0;
-    font-size: 1.1rem;
-}
+        /* Modal de confirmación específico */
+        .confirm-modal .modal-body {
+            text-align: center;
+            padding: 1rem 0;
+            font-size: 1.1rem;
+        }
 
-.confirm-modal .modal-icon {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    display: block;
-    width: 100%;
-}
+        .confirm-modal .modal-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+            width: 100%;
+        }
 
-.confirm-modal .modal-title {
-    text-align: center;
-    width: 100%;
-}
+        .confirm-modal .modal-title {
+            text-align: center;
+            width: 100%;
+        }
 
-/* Close button */
-.modal-close {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: none;
-    border: none;
-    color: var(--white);
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 4px;
-    transition: all 0.3s;
-}
+        /* Close button */
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
 
-.modal-close:hover {
-    background: var(--medium-gray);
-    color: var(--gold);
-}
+        .modal-close:hover {
+            background: var(--medium-gray);
+            color: var(--gold);
+        }
 
-/* Loading states */
-.btn.loading {
-    position: relative;
-    color: transparent;
-}
+        /* Loading states */
+        .btn.loading {
+            position: relative;
+            color: transparent;
+        }
 
-.btn.loading::after {
-    content: '';
-    position: absolute;
-    width: 16px;
-    height: 16px;
-    top: 50%;
-    left: 50%;
-    margin-left: -8px;
-    margin-top: -8px;
-    border: 2px solid transparent;
-    border-top-color: var(--black);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-left: -8px;
+            margin-top: -8px;
+            border: 2px solid transparent;
+            border-top-color: var(--black);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -478,9 +476,9 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
             <div class="header">
                 <h1>Panel Administrativo</h1>
                 <div>
-                    Bienvenido, <?php echo $user['username']; ?> 
+                    Bienvenido, <?php echo htmlspecialchars($user['username']); ?> 
                     <span class="role-badge <?php echo $admin['role'] === 'super_admin' ? 'role-super_admin' : 'role-admin'; ?>">
-                        <?php echo $admin['role']; ?>
+                        <?php echo htmlspecialchars($admin['role']); ?>
                     </span>
                 </div>
             </div>
@@ -777,53 +775,21 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
             <div id="admins" class="tab-content">
                 <h2>Gestión de Administradores</h2>
                 
-                <button class="btn" onclick="showAdminForm()">
-                    <i class="fas fa-user-plus"></i> Agregar Administrador
-                </button>
+                <div class="card">
+                    <h3>Buscar Usuarios</h3>
+                    <div class="form-group">
+                        <input type="text" id="userSearch" class="form-control" 
+                               placeholder="Buscar usuario por nombre o email..." 
+                               onkeyup="searchUsers(this.value)">
+                    </div>
+                </div>
                 
-                <!-- Formulario de Administrador -->
-                <div id="adminForm" class="card" style="display: none;">
-                    <h3 id="adminFormTitle">Agregar Nuevo Administrador</h3>
-                    <form id="adminFormElement">
-                        <input type="hidden" id="adminId" name="adminId" value="">
-                        
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                            <div class="form-group">
-                                <label>Usuario</label>
-                                <select id="adminUserId" name="user_id" class="form-control" required>
-                                    <option value="">Seleccionar usuario</option>
-                                    <?php
-                                    $stmt = $db->query("
-                                        SELECT u.id, u.username, u.avatar, u.email 
-                                        FROM users u 
-                                        LEFT JOIN admins a ON u.id = a.user_id 
-                                        WHERE a.user_id IS NULL
-                                        ORDER BY u.username
-                                    ");
-                                    while ($userRow = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                        $avatar = $userRow['avatar'] ? $userRow['avatar'] : 'https://cdn.discordapp.com/embed/avatars/0.png';
-                                        echo "<option value='{$userRow['id']}' data-avatar='{$avatar}'>{$userRow['username']} ({$userRow['email']})</option>";
-                                    }
-                                    ?>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label>Rol</label>
-                                <select id="adminRole" name="role" class="form-control" required>
-                                    <option value="admin">Administrador</option>
-                                    <option value="super_admin">Super Administrador</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn">
-                            <i class="fas fa-save"></i> Guardar Administrador
-                        </button>
-                        <button type="button" class="btn" onclick="hideAdminForm()" style="background: var(--medium-gray);">
-                            <i class="fas fa-times"></i> Cancelar
-                        </button>
-                    </form>
+                <!-- Lista de Usuarios Encontrados -->
+                <div class="card">
+                    <h3>Usuarios del Sistema</h3>
+                    <div id="usersList">
+                        <p>Busca usuarios para gestionar sus permisos de administrador.</p>
+                    </div>
                 </div>
                 
                 <!-- Lista de Administradores -->
@@ -864,14 +830,14 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
                                     </td>
                                     <td>" . date('d/m/Y', strtotime($adminRow['user_created'])) . "</td>
                                     <td>
-                                        <button class='action-btn' onclick='editAdmin({$adminRow['id']})' title='Editar'>
-                                            <i class='fas fa-edit'></i>
+                                        <button class='action-btn' onclick='editAdminRole({$adminRow['id']})' title='Cambiar Rol'>
+                                            <i class='fas fa-user-cog'></i>
                                         </button>";
                                 
                                 if ($adminRow['user_id'] != $user['id']) {
                                     echo "
-                                        <button class='action-btn' onclick='deleteAdmin({$adminRow['id']})' title='Eliminar'>
-                                            <i class='fas fa-trash'></i>
+                                        <button class='action-btn' onclick='removeAdmin({$adminRow['id']})' title='Quitar Permisos'>
+                                            <i class='fas fa-user-times'></i>
                                         </button>";
                                 } else {
                                     echo "
@@ -890,7 +856,7 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
         </div>
     </div>
 
-     <!-- SCRIPT COMPLETAMENTE NUEVO -->
+    <!-- SCRIPT COMPLETAMENTE NUEVO -->
     <script>
     // ========== SISTEMA DE MODALES ==========
     class ModalSystem {
@@ -1462,20 +1428,133 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
         }
     });
 
-    // ========== GESTIÓN DE ADMINS ==========
-    function showAdminForm() {
-        document.getElementById('adminForm').style.display = 'block';
-        document.getElementById('adminFormTitle').textContent = 'Agregar Nuevo Administrador';
-        document.getElementById('adminFormElement').reset();
-        document.getElementById('adminId').value = '';
-        document.getElementById('adminRole').value = 'admin';
+    // ========== GESTIÓN MEJORADA DE ADMINS ==========
+    let allUsers = [];
+
+    async function searchUsers(searchTerm) {
+        if (searchTerm.length < 2) {
+            document.getElementById('usersList').innerHTML = '<p>Ingresa al menos 2 caracteres para buscar.</p>';
+            return;
+        }
+
+        try {
+            const response = await fetch(`api/admins.php?action=get_all_users&search=${encodeURIComponent(searchTerm)}`);
+            const result = await response.json();
+            
+            if (!result.success) {
+                document.getElementById('usersList').innerHTML = `<p style="color: #e53e3e;">Error: ${result.message}</p>`;
+                return;
+            }
+
+            updateUsersList(result.users);
+        } catch (error) {
+            console.error('Error:', error);
+            document.getElementById('usersList').innerHTML = '<p style="color: #e53e3e;">Error de conexión</p>';
+        }
     }
 
-    function hideAdminForm() {
-        document.getElementById('adminForm').style.display = 'none';
+    function updateUsersList(users) {
+    const container = document.getElementById('usersList');
+    
+    if (!users || users.length === 0) {
+        container.innerHTML = '<p>No se encontraron usuarios.</p>';
+        return;
+    }
+    
+    let html = '<div style="display: grid; gap: 1rem;">';
+    
+    users.forEach(user => {
+        // CAMBIO AQUÍ: user.current_role -> user.user_role
+        const roleBadge = user.user_role === 'user' ? 
+            '<span style="background: #4a5568; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.8rem;">Cliente</span>' :
+            `<span class="role-badge ${user.user_role === 'super_admin' ? 'role-super_admin' : 'role-admin'}">${user.user_role}</span>`;
+        
+        html += `
+            <div style="display: flex; justify-content: between; align-items: center; padding: 1rem; background: var(--black); border-radius: 8px; border: 1px solid var(--medium-gray);">
+                <div style="flex: 1;">
+                    <img src="${user.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'}" class="user-avatar" alt="Avatar">
+                    <strong>${escapeHtml(user.username)}</strong>
+                    <br>
+                    <small style="color: #888;">${escapeHtml(user.email)}</small>
+                </div>
+                <div style="margin: 0 1rem;">
+                    ${roleBadge}
+                </div>
+                <div>
+        `;
+        
+        // CAMBIO AQUÍ TAMBIÉN: user.current_role -> user.user_role
+        if (user.user_role === 'user') {
+            html += `
+                <button class="btn" onclick="makeAdmin(${user.id}, 'admin')" style="margin-right: 0.5rem;">
+                    <i class="fas fa-user-shield"></i> Hacer Admin
+                </button>
+                <button class="btn" onclick="makeAdmin(${user.id}, 'super_admin')">
+                    <i class="fas fa-crown"></i> Hacer Super Admin
+                </button>
+            `;
+        } else {
+            html += `
+                <button class="btn" onclick="editAdminRole(${user.admin_id})" style="margin-right: 0.5rem;">
+                    <i class="fas fa-user-cog"></i> Cambiar Rol
+                </button>
+                ${user.user_role !== 'user' ? `
+                <button class="btn" onclick="removeAdmin(${user.admin_id})" style="background: #e53e3e;">
+                    <i class="fas fa-user-times"></i> Quitar Permisos
+                </button>
+                ` : ''}
+            `;
+        }
+        
+        html += `
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+    async function makeAdmin(userId, role) {
+        const confirmed = await modalSystem.confirm(
+            `¿Estás seguro de que quieres hacer a este usuario ${role === 'super_admin' ? 'Super Administrador' : 'Administrador'}?`,
+            'Asignar Permisos de Administrador'
+        );
+        
+        if (confirmed) {
+            try {
+                const formData = new FormData();
+                formData.append('action', 'create');
+                formData.append('user_id', userId);
+                formData.append('role', role);
+                
+                const response = await fetch('api/admins.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    await showSuccess(result.message);
+                    // Recargar la búsqueda actual
+                    const searchTerm = document.getElementById('userSearch').value;
+                    if (searchTerm) {
+                        searchUsers(searchTerm);
+                    }
+                    // Recargar lista de admins
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    await showError(result.message);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                await showError('Error al asignar permisos');
+            }
+        }
     }
 
-    async function editAdmin(adminId) {
+    async function editAdminRole(adminId) {
         try {
             const response = await fetch(`api/admins.php?action=get&id=${adminId}`);
             const result = await response.json();
@@ -1486,22 +1565,43 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
             }
             
             const admin = result.data;
-            document.getElementById('adminId').value = admin.id;
-            document.getElementById('adminUserId').value = admin.user_id;
-            document.getElementById('adminRole').value = admin.role;
+            const newRole = admin.role === 'super_admin' ? 'admin' : 'super_admin';
+            const roleName = newRole === 'super_admin' ? 'Super Administrador' : 'Administrador';
             
-            document.getElementById('adminFormTitle').textContent = 'Editar Administrador';
-            document.getElementById('adminForm').style.display = 'block';
+            const confirmed = await modalSystem.confirm(
+                `¿Estás seguro de que quieres cambiar el rol de este usuario a ${roleName}?`,
+                'Cambiar Rol de Administrador'
+            );
+            
+            if (confirmed) {
+                const formData = new FormData();
+                formData.append('action', 'update');
+                formData.append('adminId', adminId);
+                formData.append('role', newRole);
+                
+                const updateResponse = await fetch('api/admins.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const updateResult = await updateResponse.json();
+                
+                if (updateResult.success) {
+                    await showSuccess(updateResult.message);
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    await showError(updateResult.message);
+                }
+            }
         } catch (error) {
             console.error('Error:', error);
-            await showError('Error al cargar el administrador');
+            await showError('Error al cambiar el rol');
         }
     }
 
-    async function deleteAdmin(adminId) {
+    async function removeAdmin(adminId) {
         const confirmed = await modalSystem.confirm(
-            '¿Estás seguro de que quieres eliminar este administrador?',
-            'Eliminar Administrador'
+            '¿Estás seguro de que quieres quitar los permisos de administrador a este usuario? Se convertirá en un cliente normal.',
+            'Quitar Permisos de Administrador'
         );
         
         if (confirmed) {
@@ -1511,47 +1611,22 @@ $isSuperAdmin = ($admin['role'] === 'super_admin');
                 
                 if (result.success) {
                     await showSuccess(result.message);
-                    setTimeout(() => location.reload(), 1500);
+                    // Recargar la búsqueda actual
+                    const searchTerm = document.getElementById('userSearch').value;
+                    if (searchTerm) {
+                        searchUsers(searchTerm);
+                    }
+                    // Recargar lista de admins
+                    setTimeout(() => location.reload(), 1000);
                 } else {
                     await showError(result.message);
                 }
             } catch (error) {
                 console.error('Error:', error);
-                await showError('Error al eliminar el administrador');
+                await showError('Error al quitar permisos');
             }
         }
     }
-
-    document.getElementById('adminFormElement').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const submitButton = this.querySelector('button[type="submit"]');
-        const adminId = document.getElementById('adminId').value;
-        const formData = new FormData(this);
-        formData.append('action', adminId ? 'update' : 'create');
-        
-        setLoading(submitButton, true);
-        
-        try {
-            const response = await fetch('api/admins.php', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            
-            if (result.success) {
-                await showSuccess(result.message);
-                setTimeout(() => location.reload(), 1500);
-            } else {
-                await showError(result.message);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            await showError('Error de conexión');
-        } finally {
-            setLoading(submitButton, false);
-        }
-    });
 
     // Función para gestionar productos desde juegos
     function manageProducts(gameId) {
